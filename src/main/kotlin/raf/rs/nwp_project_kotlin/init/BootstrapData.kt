@@ -3,8 +3,8 @@ package raf.rs.nwp_project_kotlin.init
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 import raf.rs.nwp_project_kotlin.enums.PermissionType
-import raf.rs.nwp_project_kotlin.model.Permission
-import raf.rs.nwp_project_kotlin.model.User
+import raf.rs.nwp_project_kotlin.model.users.Permission
+import raf.rs.nwp_project_kotlin.model.users.User
 import raf.rs.nwp_project_kotlin.repository.PermissionRepository
 import raf.rs.nwp_project_kotlin.service.UserService
 
@@ -37,6 +37,4 @@ class BootstrapData (
             )
         }
     }
-
-
 }

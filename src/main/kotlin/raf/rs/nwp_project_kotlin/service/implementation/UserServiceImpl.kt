@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import raf.rs.nwp_project_kotlin.model.User
+import raf.rs.nwp_project_kotlin.model.users.User
 import raf.rs.nwp_project_kotlin.repository.PermissionRepository
 import raf.rs.nwp_project_kotlin.repository.UserRepository
 import raf.rs.nwp_project_kotlin.service.UserService

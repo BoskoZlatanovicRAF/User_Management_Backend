@@ -1,4 +1,4 @@
-package raf.rs.nwp_project_kotlin.model
+package raf.rs.nwp_project_kotlin.model.users
 
 import jakarta.persistence.*
 import raf.rs.nwp_project_kotlin.enums.PermissionType

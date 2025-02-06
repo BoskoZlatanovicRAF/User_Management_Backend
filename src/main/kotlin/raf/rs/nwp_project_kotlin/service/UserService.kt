@@ -2,7 +2,7 @@ package raf.rs.nwp_project_kotlin.service
 
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
-import raf.rs.nwp_project_kotlin.model.User
+import raf.rs.nwp_project_kotlin.model.users.User
 import java.util.*
 
 @Service

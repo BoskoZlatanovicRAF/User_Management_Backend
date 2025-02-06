@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
-import raf.rs.nwp_project_kotlin.model.User
+import raf.rs.nwp_project_kotlin.model.users.User
 import raf.rs.nwp_project_kotlin.service.UserService
 
 @RestController
@@ -56,4 +56,5 @@ class UserController(private val userService: UserService) {
         userService.deleteById(id)
         return ResponseEntity.ok().build()
     }
+
 }

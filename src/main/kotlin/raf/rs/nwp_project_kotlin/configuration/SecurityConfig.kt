@@ -40,6 +40,8 @@ class SecurityConfig {
                 auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow OPTIONS
                     .requestMatchers("/api/auth/**").permitAll() // dozvoli sve rute koje pocinju ovako da budu bez jwt (ovo ce biti samo login ruta)
+                    .requestMatchers("/ws/**").permitAll()  // dozvoljavamo WebSocket bez autentifikacije
+                    .requestMatchers("/ws").permitAll()
                     .anyRequest().authenticated() // sve ostale rute trazi jwt
             }
             .sessionManagement { session ->
