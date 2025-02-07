@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import raf.rs.nwp_project_kotlin.dto.OrderDTO
+import raf.rs.nwp_project_kotlin.dto.UserDTO
 import raf.rs.nwp_project_kotlin.enums.OrderStatus
 import raf.rs.nwp_project_kotlin.model.errors.ErrorMessage
 import raf.rs.nwp_project_kotlin.model.orders.Order
@@ -31,10 +33,13 @@ class OrderServiceImpl(
         if (currentActiveOrders >= 3) {
             throw RuntimeException("Maximum number of concurrent orders reached")
         }
-        return orderRepository.save(order.copy(
-            status = OrderStatus.ORDERED,
-            scheduledFor = null
-        ))
+
+        order.status = OrderStatus.ORDERED
+        val savedOrder = orderRepository.save(order)
+
+        // Eksplicitno učitaj order sa svim relacijama
+        return orderRepository.findById(savedOrder.id!!)
+            .orElseThrow { RuntimeException("Order not found after saving") }
     }
 
     override fun getUserOrders(user: User, page: Int, size: Int): Page<Order> =
@@ -87,8 +92,9 @@ class OrderServiceImpl(
     fun processOrderStatuses() {
         val now = LocalDateTime.now()
 
+
         orderRepository.findByStatus(OrderStatus.ORDERED).forEach { order ->
-            if (order.createdAt!!.plusSeconds(10) <= now) {
+            if (order.scheduledFor == null && order.createdAt!!.plusSeconds(10) <= now) {
                 updateOrderStatus(order.id!!, OrderStatus.PREPARING)
             }
         }
@@ -106,7 +112,7 @@ class OrderServiceImpl(
         }
     }
 
-    @Scheduled(fixedDelay = 60000) // Proverava svakog minuta
+    @Scheduled(fixedDelay = 2000) // Proverava svakog minuta
     fun processScheduledOrders() {
         val now = LocalDateTime.now()
         // Pronalazi sve zakazane porudžbine čije je vreme došlo
@@ -126,6 +132,7 @@ class OrderServiceImpl(
                                 message = "Maximum number of concurrent orders reached"
                             )
                         )
+                        updateOrderStatus(order.id!!, OrderStatus.CANCELED)
                     } else {
                         // Inače započni obradu porudžbine
                         updateOrderStatus(order.id!!, OrderStatus.PREPARING)
@@ -141,4 +148,5 @@ class OrderServiceImpl(
                 }
             }
     }
+
 }
