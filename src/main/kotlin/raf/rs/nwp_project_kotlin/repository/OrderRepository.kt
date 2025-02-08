@@ -16,10 +16,15 @@ interface OrderRepository : JpaRepository<Order, Long> {
     fun findByCreatedBy(user: User, pageable: Pageable): Page<Order>
     @EntityGraph(attributePaths = ["createdBy"])
     override fun findAll(): List<Order>
-    fun findByStatus(status: OrderStatus): List<Order>
     fun countByStatusIn(statuses: List<OrderStatus>): Int
-    fun findByScheduledForBeforeAndStatus(
-        scheduledFor: LocalDateTime,
-        status: OrderStatus
-    ): List<Order>
-}
+    fun findByScheduledForBeforeAndStatus(scheduledFor: LocalDateTime, status: OrderStatus): List<Order>
+    fun findByStatus(status: OrderStatus, pageable: Pageable): Page<Order>
+    fun findByCreatedAtBetween(dateFrom: LocalDateTime, dateTo: LocalDateTime, pageable: Pageable): Page<Order>
+    fun findByCreatedById(userId: Long, pageable: Pageable): Page<Order>
+    fun findByCreatedByAndStatus(user: User, status: OrderStatus, pageable: Pageable): Page<Order>
+    fun findByCreatedByAndCreatedAtBetween(
+        user: User,
+        dateFrom: LocalDateTime,
+        dateTo: LocalDateTime,
+        pageable: Pageable
+    ): Page<Order>}

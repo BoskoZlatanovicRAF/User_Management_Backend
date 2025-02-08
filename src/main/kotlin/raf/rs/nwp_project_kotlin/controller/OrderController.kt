@@ -27,15 +27,23 @@ class OrderController(
     @PreAuthorize("hasAuthority('CAN_SEARCH_ORDER')")
     fun getOrders(
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "10") size: Int
+        @RequestParam(defaultValue = "10") size: Int,
+        @RequestParam(required = false) status: OrderStatus?,
+        @RequestParam(required = false) dateFrom: String?,
+        @RequestParam(required = false) dateTo: String?,
+        @RequestParam(required = false) userId: Long?
     ): ResponseEntity<Page<OrderDTO>> {
         val currentUser = getCurrentUser()
+        val fromDateTime = dateFrom?.let { LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) }
+        val toDateTime = dateTo?.let { LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) }
+
         val orders = if (currentUser.email == "admin@example.com") {
-            orderService.getAllOrders(page, size).map { toOrderDTO(it) }
+            orderService.getAllOrders(page, size, status, fromDateTime, toDateTime, userId)
         } else {
-            orderService.getUserOrders(currentUser, page, size).map { toOrderDTO(it) }
+            orderService.getUserOrders(currentUser, page, size, status, fromDateTime, toDateTime)
         }
-        return ResponseEntity.ok(orders)
+
+        return ResponseEntity.ok(orders.map { toOrderDTO(it) })
     }
 
 

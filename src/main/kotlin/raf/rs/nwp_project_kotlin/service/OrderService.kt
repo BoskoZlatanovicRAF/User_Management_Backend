@@ -10,8 +10,8 @@ import java.time.LocalDateTime
 @Service
 interface OrderService {
     fun createOrder(order: Order): Order
-    fun getUserOrders(user: User, page: Int, size: Int): Page<Order>
-    fun getAllOrders(page: Int, size: Int): Page<Order>
+    fun getAllOrders(page: Int, size: Int, status: OrderStatus?, dateFrom: LocalDateTime?, dateTo: LocalDateTime?, userId: Long?): Page<Order>
+    fun getUserOrders(user: User, page: Int, size: Int, status: OrderStatus?, dateFrom: LocalDateTime?, dateTo: LocalDateTime?): Page<Order>
     fun cancelOrder(id: Long)
     fun updateOrderStatus(id: Long, newStatus: OrderStatus): Order
     fun getOrder(id: Long): Order

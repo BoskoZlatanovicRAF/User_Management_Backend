@@ -4,8 +4,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import raf.rs.nwp_project_kotlin.dto.OrderDTO
-import raf.rs.nwp_project_kotlin.dto.UserDTO
 import raf.rs.nwp_project_kotlin.enums.OrderStatus
 import raf.rs.nwp_project_kotlin.model.errors.ErrorMessage
 import raf.rs.nwp_project_kotlin.model.orders.Order
@@ -42,12 +40,29 @@ class OrderServiceImpl(
             .orElseThrow { RuntimeException("Order not found after saving") }
     }
 
-    override fun getUserOrders(user: User, page: Int, size: Int): Page<Order> =
-        orderRepository.findByCreatedBy(user, PageRequest.of(page, size))
+    override fun getAllOrders(page: Int, size: Int, status: OrderStatus?, dateFrom: LocalDateTime?, dateTo: LocalDateTime?, userId: Long?): Page<Order>
+    {
+        val pageable = PageRequest.of(page, size)
 
-    override fun getAllOrders(page: Int, size: Int): Page<Order> =
-        orderRepository.findAll(PageRequest.of(page, size))
+        return when {
+            status != null -> orderRepository.findByStatus(status, pageable)
+            dateFrom != null && dateTo != null -> orderRepository.findByCreatedAtBetween(dateFrom, dateTo, pageable)
+            userId != null -> orderRepository.findByCreatedById(userId, pageable)
+            else -> orderRepository.findAll(pageable)
+        }
+    }
 
+    override fun getUserOrders(user: User, page: Int, size: Int, status: OrderStatus?, dateFrom: LocalDateTime?, dateTo: LocalDateTime?): Page<Order>
+    {
+        val pageable = PageRequest.of(page, size)
+
+        return when {
+            status != null -> orderRepository.findByCreatedByAndStatus(user, status, pageable)
+            dateFrom != null && dateTo != null ->
+                orderRepository.findByCreatedByAndCreatedAtBetween(user, dateFrom, dateTo, pageable)
+            else -> orderRepository.findByCreatedBy(user, pageable)
+        }
+    }
     override fun cancelOrder(id: Long) {
         val order = orderRepository.findById(id).orElseThrow()
         if (order.status != OrderStatus.ORDERED) {
@@ -88,29 +103,29 @@ class OrderServiceImpl(
         ))
     }
 
-    @Scheduled(fixedDelay = 5000) // Proverava svakih 5 sekundi
-    fun processOrderStatuses() {
-        val now = LocalDateTime.now()
+@Scheduled(fixedDelay = 5000) // Proverava svakih 5 sekundi
+fun processOrderStatuses() {
+    val now = LocalDateTime.now()
+    val pageable = PageRequest.of(0, 10)
 
-
-        orderRepository.findByStatus(OrderStatus.ORDERED).forEach { order ->
-            if (order.scheduledFor == null && order.createdAt!!.plusSeconds(10) <= now) {
-                updateOrderStatus(order.id!!, OrderStatus.PREPARING)
-            }
-        }
-
-        orderRepository.findByStatus(OrderStatus.PREPARING).forEach { order ->
-            if (order.statusUpdatedAt!!.plusSeconds(15) <= now) {
-                updateOrderStatus(order.id!!, OrderStatus.IN_DELIVERY)
-            }
-        }
-
-        orderRepository.findByStatus(OrderStatus.IN_DELIVERY).forEach { order ->
-            if (order.statusUpdatedAt!!.plusSeconds(20) <= now) {
-                updateOrderStatus(order.id!!, OrderStatus.DELIVERED)
-            }
+    orderRepository.findByStatus(OrderStatus.ORDERED, pageable).forEach { order ->
+        if (order.scheduledFor == null && order.createdAt!!.plusSeconds(10) <= now) {
+            updateOrderStatus(order.id!!, OrderStatus.PREPARING)
         }
     }
+
+    orderRepository.findByStatus(OrderStatus.PREPARING, pageable).forEach { order ->
+        if (order.statusUpdatedAt!!.plusSeconds(15) <= now) {
+            updateOrderStatus(order.id!!, OrderStatus.IN_DELIVERY)
+        }
+    }
+
+    orderRepository.findByStatus(OrderStatus.IN_DELIVERY, pageable).forEach { order ->
+        if (order.statusUpdatedAt!!.plusSeconds(20) <= now) {
+            updateOrderStatus(order.id!!, OrderStatus.DELIVERED)
+        }
+    }
+}
 
     @Scheduled(fixedDelay = 2000) // Proverava svakog minuta
     fun processScheduledOrders() {
