@@ -6,7 +6,7 @@ enum class PermissionType {
     CAN_UPDATE_USERS,
     CAN_DELETE_USERS,
 
-    // Nove permisije za porudžbine
+    // permisije za porudžbine
     CAN_SEARCH_ORDER,
     CAN_PLACE_ORDER,
     CAN_CANCEL_ORDER,

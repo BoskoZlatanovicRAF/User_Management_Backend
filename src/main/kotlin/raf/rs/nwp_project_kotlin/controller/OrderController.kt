@@ -51,7 +51,6 @@ class OrderController(
     @PreAuthorize("hasAuthority('CAN_PLACE_ORDER')")
     fun createOrder(@RequestBody request: CreateOrderRequest): ResponseEntity<Order> {
         val currentUser = getCurrentUser()
-        // kreiramo nov Order objekat umesto copy
         val newOrder = Order(
             status = OrderStatus.ORDERED,
             createdBy = currentUser,
@@ -93,7 +92,7 @@ class OrderController(
     @PreAuthorize("hasAuthority('CAN_SCHEDULE_ORDER')")
     fun scheduleOrder(
         @RequestBody request: CreateOrderRequest,
-        @RequestParam scheduledTime: String  // promenili smo u String
+        @RequestParam scheduledTime: String  // String jer nije radilo kad se salje kao LocalDateTime zbog Angulara, da bi prebacio u ISO
     ): ResponseEntity<OrderDTO> {
         val currentUser = getCurrentUser()
         val dateTime = LocalDateTime.parse(scheduledTime, DateTimeFormatter.ISO_DATE_TIME)

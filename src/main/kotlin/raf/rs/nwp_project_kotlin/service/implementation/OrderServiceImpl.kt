@@ -103,31 +103,31 @@ class OrderServiceImpl(
         ))
     }
 
-@Scheduled(fixedDelay = 5000) // Proverava svakih 5 sekundi
-fun processOrderStatuses() {
-    val now = LocalDateTime.now()
-    val pageable = PageRequest.of(0, 10)
+    @Scheduled(fixedDelay = 5000) // Proverava svakih 5 sekundi
+    fun processOrderStatuses() {
+        val now = LocalDateTime.now()
+        val pageable = PageRequest.of(0, 10)
 
-    orderRepository.findByStatus(OrderStatus.ORDERED, pageable).forEach { order ->
-        if (order.scheduledFor == null && order.createdAt!!.plusSeconds(10) <= now) {
-            updateOrderStatus(order.id!!, OrderStatus.PREPARING)
+        orderRepository.findByStatus(OrderStatus.ORDERED, pageable).forEach { order ->
+            if (order.scheduledFor == null && order.createdAt.plusSeconds(10) <= now) {
+                updateOrderStatus(order.id!!, OrderStatus.PREPARING)
+            }
+        }
+
+        orderRepository.findByStatus(OrderStatus.PREPARING, pageable).forEach { order ->
+            if (order.statusUpdatedAt.plusSeconds(15) <= now) {
+                updateOrderStatus(order.id!!, OrderStatus.IN_DELIVERY)
+            }
+        }
+
+        orderRepository.findByStatus(OrderStatus.IN_DELIVERY, pageable).forEach { order ->
+            if (order.statusUpdatedAt.plusSeconds(20) <= now) {
+                updateOrderStatus(order.id!!, OrderStatus.DELIVERED)
+            }
         }
     }
 
-    orderRepository.findByStatus(OrderStatus.PREPARING, pageable).forEach { order ->
-        if (order.statusUpdatedAt!!.plusSeconds(15) <= now) {
-            updateOrderStatus(order.id!!, OrderStatus.IN_DELIVERY)
-        }
-    }
-
-    orderRepository.findByStatus(OrderStatus.IN_DELIVERY, pageable).forEach { order ->
-        if (order.statusUpdatedAt!!.plusSeconds(20) <= now) {
-            updateOrderStatus(order.id!!, OrderStatus.DELIVERED)
-        }
-    }
-}
-
-    @Scheduled(fixedDelay = 2000) // Proverava svakog minuta
+    @Scheduled(fixedDelay = 2000) // Proverava svakih 2 sekunde
     fun processScheduledOrders() {
         val now = LocalDateTime.now()
         // Pronalazi sve zakazane porudžbine čije je vreme došlo

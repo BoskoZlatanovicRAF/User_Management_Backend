@@ -2,7 +2,6 @@ package raf.rs.nwp_project_kotlin.controller
 
 import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import raf.rs.nwp_project_kotlin.model.orders.Dish
 import raf.rs.nwp_project_kotlin.service.DishService

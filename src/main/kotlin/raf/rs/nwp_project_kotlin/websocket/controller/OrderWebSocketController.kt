@@ -9,9 +9,6 @@ class OrderWebSocketController(
     private val simpMessagingTemplate: SimpMessagingTemplate
 ) {
     fun sendOrderStatusUpdate(update: OrderStatusUpdate) {
-        simpMessagingTemplate.convertAndSend(
-            "/topic/orders/${update.orderId}",
-            update
-        )
+        simpMessagingTemplate.convertAndSend("/topic/orders/${update.orderId}", update)
     }
 }

@@ -48,3 +48,18 @@ data class Order(
         scheduledFor = null
     )
 }
+
+
+/*
+// Version = 0
+val order = orderRepository.findById(1).get()
+
+// Neko drugi u međuvremenu menja isti order
+val order2 = orderRepository.findById(1).get()
+order2.status = OrderStatus.CANCELED
+orderRepository.save(order2)  // Version = 1
+
+// Pokušaj da se sačuva prva verzija će fail-ovati
+order.status = OrderStatus.DELIVERED
+orderRepository.save(order)  // Throws OptimisticLockException jer je version već 1
+ */

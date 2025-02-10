@@ -2,11 +2,9 @@ package raf.rs.nwp_project_kotlin.controller
 
 import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import raf.rs.nwp_project_kotlin.dto.ErrorMessageDTO
-import raf.rs.nwp_project_kotlin.model.errors.ErrorMessage
 import raf.rs.nwp_project_kotlin.service.ErrorMessageService
 import raf.rs.nwp_project_kotlin.service.UserService
 import raf.rs.nwp_project_kotlin.util.toErrorMessageDTO

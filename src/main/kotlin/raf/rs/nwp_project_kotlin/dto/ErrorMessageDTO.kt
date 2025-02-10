@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 data class ErrorMessageDTO(
     val id: Long?,
     val date: LocalDateTime,
-    val order: OrderDTO,  // Menjamo Order sa OrderDTO
+    val order: OrderDTO,
     val operation: String,
     val message: String
 )
